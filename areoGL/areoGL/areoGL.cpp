@@ -61,9 +61,9 @@ void resizeSC(int width, int height) {
 
 BOOL renderSC() {
 
-	
-	
-	glClearColor(0,0,0,0.0f);
+
+
+	glClearColor(0, 0, 0, 0.0f);
 
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -72,11 +72,11 @@ BOOL renderSC() {
 
 	glColor3f(0, 1, 1);
 	glBegin(GL_TRIANGLES);                              // Drawing Using Triangles
-	glColor4f(1.0f, 0.0f, 0.0f,0.5f);                      // Set The Color To Red
+	glColor4f(1.0f, 0.0f, 0.0f, 0.5f);                      // Set The Color To Red
 	glVertex3f(0.0f, 1.0f, 0.0f);                  // Top
-	glColor4f(0.0f, 1.0f, 0.0f,0.5f);                      // Set The Color To Green
+	glColor4f(0.0f, 1.0f, 0.0f, 0.5f);                      // Set The Color To Green
 	glVertex3f(-1.0f, -1.0f, 0.0f);                  // Bottom Left
-	glColor4f(0.0f, 0.0f, 1.0f,0.5f);                      // Set The Color To Blue
+	glColor4f(0.0f, 0.0f, 1.0f, 0.5f);                      // Set The Color To Blue
 	glVertex3f(1.0f, -1.0f, 0.0f);                  // Bottom Right
 	glEnd();
 
@@ -134,40 +134,38 @@ BOOL CreateHGLRC(HWND hWnd) {
 }
 
 LRESULT CALLBACK WindowFunc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	PAINTSTRUCT ps;
 
 	switch (msg) {
-	case WM_CREATE:
-		break;
-
 	case WM_DESTROY:
+		PostQuitMessage(0);
+
 		if (m_hrc) {
 			wglMakeCurrent(NULL, NULL);
 			wglDeleteContext(m_hrc);
 		}
-		PostQuitMessage(0);
-		break;
 
+		break;
 	default:
 		return DefWindowProc(hWnd, msg, wParam, lParam);
+		break;
 	}
 
 	return 0;
 }
 
-int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str, int nWinMode) {
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	WNDCLASSEX wc;
 	memset(&wc, 0, sizeof(wc));
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = (WNDPROC)WindowFunc;
+	wc.lpfnWndProc = WindowFunc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
-	wc.hInstance = hThisInst;
+	wc.hInstance = hInstance;
 	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)CreateSolidBrush(0x00000000);
+	wc.hbrBackground = (HBRUSH)CreateSolidBrush(0x000000);
 	wc.lpszClassName = szAppName;
 
 	if (!RegisterClassEx(&wc)) {
@@ -176,8 +174,8 @@ int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str, int nWin
 	}
 
 	HWND hWnd = CreateWindowEx(NULL, szAppName, wcWndName,
-		WS_VISIBLE | WS_OVERLAPPEDWINDOW, 200, 150, w, h,
-		NULL, NULL, hThisInst, NULL);
+		WS_VISIBLE | WS_OVERLAPPEDWINDOW, 200, 200, w, h,
+		NULL, NULL, hInstance, NULL);
 
 	if (!hWnd) {
 		MessageBox(NULL, _T("CreateWindowEx - failed"), _T("Error"), MB_OK | MB_ICONERROR);
@@ -201,9 +199,10 @@ int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str, int nWin
 	resizeSC(w, h);
 	ReleaseDC(hWnd, hdc);
 
-	MSG msg;
-	while (1) {
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+	MSG msg{ 0 };
+
+	while (msg.message != WM_QUIT) {
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
@@ -218,5 +217,5 @@ int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str, int nWin
 		}
 	}
 
-	return (FALSE);
+	return 0;
 }
